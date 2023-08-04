@@ -21,7 +21,9 @@ for(let i=0;i<100;i++){
             fontFamily: "Arial",
             fontSize: "14",
             fontColor: "#000000",
-            BGcolor: "transparent" //just for indication purpose
+            BGcolor: "transparent", //just for indication purpose
+            value: "",
+            formula: ""
 
         }
         sheetRow.push(cellProp);
@@ -54,7 +56,7 @@ bold.addEventListener("click",(e)=>{
     // to do that -> we can take the address
     //we need to decode that address
     let address= addressBar.value;
-   let [cell,cellProp]= activecell(address)
+   let [cell,cellProp]= getCell(address)
    console.log(address);
    
    //Modification
@@ -70,7 +72,7 @@ italic.addEventListener("click",(e)=>{
     // to do that -> we can take the address
     //we need to decode that address
    let address= addressBar.value;
-   let [cell,cellProp]= activecell(address)
+   let [cell,cellProp]= getCell(address)
    
    //Modification
 
@@ -87,7 +89,7 @@ underline.addEventListener("click",(e)=>{
     // to do that -> we can take the address
     //we need to decode that address
     let address= addressBar.value;
-   let [cell,cellProp]= activecell(address)
+   let [cell,cellProp]= getCell(address)
    
    //Modification
    cellProp.underline= !cellProp.underline
@@ -100,7 +102,7 @@ underline.addEventListener("click",(e)=>{
 
 fontSize.addEventListener("change",(e)=>{
     let address= addressBar.value;
-    let [cell,cellProp]= activecell(address)
+    let [cell,cellProp]= getCell(address)
 
    //data change
     cellProp.fontSize= fontSize.value;
@@ -111,7 +113,7 @@ fontSize.addEventListener("change",(e)=>{
 
 fontFamily.addEventListener("change",(e)=>{
     let address= addressBar.value;
-    let [cell,cellProp]= activecell(address)
+    let [cell,cellProp]= getCell(address)
 
    //data change
     cellProp.fontFamily= fontFamily.value;
@@ -122,7 +124,7 @@ fontFamily.addEventListener("change",(e)=>{
 
 fontColor.addEventListener("change",(e)=>{
     let address= addressBar.value;
-    let [cell,cellProp]= activecell(address)
+    let [cell,cellProp]= getCell(address)
 
     //data change
     cellProp.fontColor= fontColor.value;
@@ -134,7 +136,7 @@ fontColor.addEventListener("change",(e)=>{
 
 bgColor.addEventListener("change",(e)=>{
     let address= addressBar.value;
-    let [cell,cellProp]= activecell(address)
+    let [cell,cellProp]= getCell(address)
 
     //data change
     cellProp.bgColor= bgColor.value;
@@ -149,13 +151,13 @@ for(let i=0;i<allCells.length;i++){
     addListnerToAtteachCellProp(allCells[i]);
 }
 
-//in alginment out of three alignments any one will be active
+//in alignment out of three alignments any one will be active
 // by defualt the alignment is left
 alignment.forEach(ele => {
     ele.addEventListener("click", (e) => {
         // code for alignment change
         let address=addressBar.value;
-        let [cell, cellProp]=activecell(address);
+        let [cell, cellProp]=getCell(address);
 
         let alignValue=e.target.classList[0];
         cellProp.alignment= alignValue ; // data change
@@ -182,7 +184,7 @@ alignment.forEach(ele => {
     });
 });
 
-//changing only the ui of a respective cell
+//changing only the UI of a respective cell
 function addListnerToAtteachCellProp(cell){
     //work
     cell.addEventListener("click",(e)=>{
@@ -234,7 +236,7 @@ function addListnerToAtteachCellProp(cell){
 }
 
 //function that will give the the access 
-function activecell(address){
+function getCell(address){
 
     // destructuring
     let [rid,cid]=decodeRIDCIDfromAddress(address);
@@ -252,10 +254,10 @@ function activecell(address){
 function decodeRIDCIDfromAddress(address){
 
     // e.g. address-> "A1" : in string format
-    let rid=Number(address.slice(1))-1; //1-> 0
+    let rid=Number(address.slice(1))-1; // 1 -> 0
 
    // colid is alphabet
-    let cid=Number(address.charCodeAt(0))-65; //"A" -> 65
+    let cid=Number(address.charCodeAt(0))-65; // "A" -> 65
 
     // notice while encoding we where asdding i , j so while decoding 
     // to get the neutral value we need to subtract it
