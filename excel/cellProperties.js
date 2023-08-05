@@ -23,7 +23,8 @@ for(let i=0;i<100;i++){
             fontColor: "#000000",
             BGcolor: "transparent", //just for indication purpose
             value: "",
-            formula: ""
+            formula: "",
+            children: [] // for  children that are depended on cell cells 
 
         }
         sheetRow.push(cellProp);
@@ -181,6 +182,8 @@ alignment.forEach(ele => {
                 rightAlign.style.backgroundColor=activeColorProp;
                 break;     
         }
+
+
     });
 });
 
@@ -229,6 +232,12 @@ function addListnerToAtteachCellProp(cell){
                 rightAlign.style.backgroundColor=activeColorProp;
                 break;     
         }
+
+        let formulabar=document.querySelector(".formula-bar");
+        formulabar=cellProp.formula;
+        cell.value=cellProp.value;
+
+
 
 
     })

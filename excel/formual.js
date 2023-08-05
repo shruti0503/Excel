@@ -1,3 +1,16 @@
+// function getCell(address){
+
+//     // destructuring
+//     let [rid,cid]=decodeRIDCIDfromAddress(address);
+
+//     //access cell and storage object
+//     let cell=document.querySelector(`.cell[rid="${rid}"][cid="${cid}"]`)
+//     let cellProp=sheetDB[rid][cid];
+//     return [cell, cellProp];
+//     // for UI change we will use : cell
+//     // for data change we will use : cellProp
+
+// }
 // first in whichever cell i work
 // i need to store the daata
 // we did in cellProp in sheetDB
@@ -12,7 +25,6 @@
 // step 1 
 
 //let addressBar = document.querySelector("#addressBar");
-
 for (let i = 0; i < 100; i++) {
     for (let j = 0; j < 26; j++) {
       let cell = document.querySelector(`.cell[rid="${i}"][cid="${j}"]`);
@@ -21,6 +33,13 @@ for (let i = 0; i < 100; i++) {
           let address = addressBar.value;
           let [activeCell, cellProp] = getCell(address);
           let enteredData = activeCell.innerText;
+
+          if(enteredData===cellProp.value) return ;
+
+          // if modifies remove pc relation, update children with new modified value
+          removeChild(cellProp.formula);
+          cellProp.formula=" ";
+          updateChildrenCells(address);
   
           cellProp.value = enteredData;
           // console.log(cellProp); 
@@ -34,30 +53,108 @@ let formulaBar=document.querySelector(".formula-bar");
 // on enter event : --> normal expression, dependecy expression
 // normal expression: 10+20 =  ; DEPENDCY EXP+ A1+A2+10
 
+
 formulaBar.addEventListener("keydown",(e)=>{
+    //accessing the formula expression from the formula bar, evaluate new formula 
     let inputFormula=formulaBar.value;
 
     if(e.key==="Enter" && inputFormula){
 
-        let evaluatedvalue=evaluateFormula(inputFormula);
-        // To update cell prop and ui
-        setCellUIandCellProp(evaluatedvalue, inputFormula);
+        let evaluatedvalue=evaluate(inputFormula);
+        // cahnge in formula break old P-C relationship and establish new P-C relation
+        let address=addressBar.value;
+        let [cell, cellProp]=getCell(address);
+        if(inputFormula!==cellProp.formula) removeChild(cellProp.formula);
+
+         // To update cell prop and ui
+        setCellUIandCellProp(evaluatedvalue, inputFormula, address);
+        addChildToParent(inputFormula);
+        updateChildrenCells(inputFormula);
+        console.log(sheetDB);
 
     }
 
 })
 
-function evaluate(formula){
-    return eval(formula);
-}
-
-function setCellUIandCellProp(evaluatedvalue, formula){
+// establshing poarent child relationship
+function addChildToParent(formula){
     let address=addressBar.value;
-    let [cell,cellProp]=getCell(address);
+    // the formula is in string -> unstring it using split()
+    let encodedFormula= formula.split(" ");
+    for(let i=0;i<encodedFormula.length;i++){
+        let asciiValue= encodedFormula[i].charCodeAt(0);
+        if(asciiValue >= 65 && asciiValue <=90){
+            let [parentCell, parentCellProp]= getCell(encodedFormula[i]);
+            parentCellProp.children.push(childAddress);
+        }
 
+    }
+
+}
+function removeChild(formula){
+    let address=addressBar.value;
+    // the formula is in string -> unstring it using split()
+    let encodedFormula= formula.split(" ");
+    for(let i=0;i<encodedFormula.length;i++){
+        let asciiValue= encodedFormula[i].charCodeAt(0);
+        if(asciiValue >= 65 && asciiValue <=90){
+            let [parentCell, parentCellProp]= getCell(encodedFormula[i]);
+            parentCellProp.children.push(childAddress);
+            let idx=parentCellProp.children.indexOf(childAddress);
+            parentCellProp.children.splice(idx,1);
+        }
+
+    }
+
+}
+// update children cells
+function updateChildrenCells(parentAddress){
+    let [parentcell, parentcellProp]=getCell(parentAddress);
+    let children=parentcellProp.children;
+    // here the base case is the length itself
+    for(let i=0;i<children.length; i++){
+        let childAddress=children[i];
+        let [childCell, childProp]= getCell(childAddress);
+        let childFormula=childProp.formula;
+
+        let evaluatedvalue= evaluate(childFormula);
+        setCellUIandCellProp(evaluatedvalue, childFormula, childAddress);
+        updateChildrenCells(childAddress);
+
+    }
+}
+function evaluate(formula) {
+    // Split the formula into an array of individual elements
+    let encodedFormula = formula.split(" ");
+  
+    // Iterate through each element of the formula
+    for (let i = 0; i < encodedFormula.length; i++) {
+      // Check if the element is a cell reference (e.g., A1, B2, etc.)
+      let asciiValue = encodedFormula[i].charCodeAt(0);
+      if (asciiValue >= 65 && asciiValue <= 90) {
+        // If it is a cell reference, fetch the cell value using the getCell() function
+        let [cell, cellProp] = getCell(encodedFormula[i]);
+        encodedFormula[i] = cellProp.value;
+      }
+    }
+  
+    // Join the encoded formula elements back into a string
+    let decodedFormula = encodedFormula.join(" ");
+  
+    // Use the eval() function to evaluate the formula expression and return the result
+    return eval(decodedFormula);
+  }
+  
+
+
+function setCellUIandCellProp(evaluatedvalue, formula, address){
+    let [cell,cellProp]=getCell(address);
+   // ui update
     cell.innerText=evaluatedvalue;
+    // db update
     cellProp.value=evaluatedvalue;
     cellProp.formula=formula;
 
 
 }
+
