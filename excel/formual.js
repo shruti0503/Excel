@@ -39,11 +39,10 @@ for (let i = 0; i < 100; i++) {
           // if modifies remove pc relation, update children with new modified value
           cellProp.value=enteredData;
           removeChild(cellProp.formula);
-          cellProp.formula=" ";
+          cellProp.formula= "";
           updateChildrenCells(address);
   
-          
-          // console.log(cellProp); 
+          console.log(cellProp); 
       });
     }
   }
@@ -56,13 +55,13 @@ for (let i = 0; i < 100; i++) {
 
     // 
     let encodedFormula=formula.split(" ");
-    for(let i=0;i<formula.length;i++){
+    for(let i=0;i<encodedFormula.length;i++){
         let asciiValue=encodedFormula[i].charCodeAt(0);
         if(asciiValue>=65 && asciiValue<=90){
             let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
             // B1: A1 + 10
             // rid -> i, cid -> j
-            graphComponenetMatrix[prid][pcid].push([crid,ccid])
+            adj[prid][pcid].push([crid,ccid])
         }
     }
   }
@@ -73,8 +72,6 @@ let formulaBar=document.querySelector(".formula-bar");
 // for formula evaluation
 // on enter event : --> normal expression, dependecy expression
 // normal expression: 10+20 =  ; DEPENDCY EXP+ A1+A2+10
-
-
 formulaBar.addEventListener("keydown",(e)=>{
     //accessing the formula expression from the formula bar, evaluate new formula 
     let inputFormula=formulaBar.value;
@@ -94,12 +91,9 @@ formulaBar.addEventListener("keydown",(e)=>{
         let iscyclic = isGraphCyclic(adj);
         if(iscyclic===true){
             alert(" Your formula is Cyclic");
-            removeChildFromParent();
             removeChildFromGraphComponent(inputFormula,address);
             return;
-
         }
-
 
          // To update cell prop and ui
         setCellUIandCellProp(evaluatedvalue, inputFormula, address);
@@ -119,13 +113,13 @@ function removeChildFromGraphComponent(formula,childAddress){
 
     // 
     let encodedFormula=formula.split(" ");
-    for(let i=0;i<formula.length;i++){
+    for(let i=0;i<encodedFormula.length;i++){
         let asciiValue=encodedFormula[i].charCodeAt(0);
         if(asciiValue>=65 && asciiValue<=90){
             let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
             // B1: A1 + 10
             // rid -> i, cid -> j
-            graphComponenetMatrix[prid][pcid].pop()
+            adj[prid][pcid].pop()
         }
     }
 
