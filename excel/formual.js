@@ -37,15 +37,36 @@ for (let i = 0; i < 100; i++) {
           if(enteredData===cellProp.value) return ;
 
           // if modifies remove pc relation, update children with new modified value
+          cellProp.value=enteredData;
           removeChild(cellProp.formula);
           cellProp.formula=" ";
           updateChildrenCells(address);
   
-          cellProp.value = enteredData;
+          
           // console.log(cellProp); 
       });
     }
   }
+
+  function  addChildToGraphComponent(formula, childAddress){
+    // decoding the child address
+    let[crid, ccid]=decodeRIDCIDfromAddress(childAddress);
+
+    // process to decode the formula eg C1= A1 + B1 ; C1 is the child of A1 and B1
+
+    // 
+    let encodedFormula=formula.split(" ");
+    for(let i=0;i<formula.length;i++){
+        let asciiValue=encodedFormula[i].charCodeAt(0);
+        if(asciiValue>=65 && asciiValue<=90){
+            let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
+            // B1: A1 + 10
+            // rid -> i, cid -> j
+            graphComponenetMatrix[prid][pcid].push([crid,ccid])
+        }
+    }
+  }
+   
 
 //accesing formula bar
 let formulaBar=document.querySelector(".formula-bar");
@@ -66,19 +87,53 @@ formulaBar.addEventListener("keydown",(e)=>{
         let [cell, cellProp]=getCell(address);
         if(inputFormula!==cellProp.formula) removeChild(cellProp.formula);
 
+       // first make relation and then check if ccycle is being made
+        addChildToGraphComponent(inputFormula, address);
+        // check formula is cyclic or not then only evaluate
+
+        let iscyclic = isGraphCyclic(adj);
+        if(iscyclic===true){
+            alert(" Your formula is Cyclic");
+            removeChildFromParent();
+            removeChildFromGraphComponent(inputFormula,address);
+            return;
+
+        }
+
+
          // To update cell prop and ui
         setCellUIandCellProp(evaluatedvalue, inputFormula, address);
         addChildToParent(inputFormula);
-        updateChildrenCells(inputFormula);
-        console.log(sheetDB);
+        console.log(JSON.stringify(sheetDB));
+        updateChildrenCells(address);
 
     }
+    
 
 })
 
+function removeChildFromGraphComponent(formula,childAddress){
+    let[crid, ccid]=decodeRIDCIDfromAddress(childAddress);
+
+    // process to decode the formula eg C1= A1 + B1 ; C1 is the child of A1 and B1
+
+    // 
+    let encodedFormula=formula.split(" ");
+    for(let i=0;i<formula.length;i++){
+        let asciiValue=encodedFormula[i].charCodeAt(0);
+        if(asciiValue>=65 && asciiValue<=90){
+            let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
+            // B1: A1 + 10
+            // rid -> i, cid -> j
+            graphComponenetMatrix[prid][pcid].pop()
+        }
+    }
+
+}
+
 // establshing poarent child relationship
 function addChildToParent(formula){
-    let address=addressBar.value;
+    let childAddress=addressBar.value;
     // the formula is in string -> unstring it using split()
     let encodedFormula= formula.split(" ");
     for(let i=0;i<encodedFormula.length;i++){
@@ -92,7 +147,7 @@ function addChildToParent(formula){
 
 }
 function removeChild(formula){
-    let address=addressBar.value;
+    let childAddress=addressBar.value;
     // the formula is in string -> unstring it using split()
     let encodedFormula= formula.split(" ");
     for(let i=0;i<encodedFormula.length;i++){

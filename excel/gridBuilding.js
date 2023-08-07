@@ -36,7 +36,7 @@ for(let i=0;i<rows;i++){
         cell.setAttribute("class","cell");
         cell.setAttribute("contenteditable","true")
         // attributes for cell and storage identification
-        cell.setAttribute("rid",i);
+        cell.setAttribute("rid",i); // custom attributes
         cell.setAttribute("cid",j);
         cell.setAttribute("spellcheck","false")
 
@@ -46,6 +46,7 @@ for(let i=0;i<rows;i++){
     }
     cellscont.appendChild(rowCont);
 }
+
 let addressBar=document.querySelector(".address-bar")
 //show value on address bar onclicking on address bar
 function showAddress(cell,i,j){
