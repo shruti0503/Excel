@@ -234,11 +234,8 @@ function addListnerToAtteachCellProp(cell){
         }
 
         let formulabar=document.querySelector(".formula-bar");
-        formulabar=cellProp.formula;
-        cell.value=cellProp.value;
-
-
-
+        formulabar.value=cellProp.formula;
+        cell.innerText=cellProp.value;
 
     })
 

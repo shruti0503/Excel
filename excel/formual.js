@@ -40,31 +40,12 @@ for (let i = 0; i < 100; i++) {
           cellProp.value=enteredData;
           removeChild(cellProp.formula);
           cellProp.formula= "";
-          updateChildrenCells(address);
+        //   updateChildrenCells(address);
   
           console.log(cellProp); 
       });
     }
-  }
-
-  function  addChildToGraphComponent(formula, childAddress){
-    // decoding the child address
-    let[crid, ccid]=decodeRIDCIDfromAddress(childAddress);
-
-    // process to decode the formula eg C1= A1 + B1 ; C1 is the child of A1 and B1
-
-    // 
-    let encodedFormula=formula.split(" ");
-    for(let i=0;i<encodedFormula.length;i++){
-        let asciiValue=encodedFormula[i].charCodeAt(0);
-        if(asciiValue>=65 && asciiValue<=90){
-            let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
-            // B1: A1 + 10
-            // rid -> i, cid -> j
-            adj[prid][pcid].push([crid,ccid])
-        }
-    }
-  }
+}
    
 
 //accesing formula bar
@@ -77,8 +58,6 @@ formulaBar.addEventListener("keydown",(e)=>{
     let inputFormula=formulaBar.value;
 
     if(e.key==="Enter" && inputFormula){
-
-        let evaluatedvalue=evaluate(inputFormula);
         // cahnge in formula break old P-C relationship and establish new P-C relation
         let address=addressBar.value;
         let [cell, cellProp]=getCell(address);
@@ -88,30 +67,27 @@ formulaBar.addEventListener("keydown",(e)=>{
         addChildToGraphComponent(inputFormula, address);
         // check formula is cyclic or not then only evaluate
 
-        let iscyclic = isGraphCyclic(adj);
-        if(iscyclic===true){
+        let iscyclic = isGraphCylic(graphComponentMatrix);
+        if(iscyclic){
             alert(" Your formula is Cyclic");
             removeChildFromGraphComponent(inputFormula,address);
             return;
         }
-
+        let evaluatedvalue = evaluate(inputFormula);
          // To update cell prop and ui
         setCellUIandCellProp(evaluatedvalue, inputFormula, address);
         addChildToParent(inputFormula);
-        console.log(JSON.stringify(sheetDB));
-        updateChildrenCells(address);
+        // console.log(JSON.stringify(sheetDB));
+        // updateChildrenCells(address);
 
     }
-    
 
 })
-
-function removeChildFromGraphComponent(formula,childAddress){
+function  addChildToGraphComponent(formula, childAddress){
+    // decoding the child address
     let[crid, ccid]=decodeRIDCIDfromAddress(childAddress);
 
     // process to decode the formula eg C1= A1 + B1 ; C1 is the child of A1 and B1
-
-    // 
     let encodedFormula=formula.split(" ");
     for(let i=0;i<encodedFormula.length;i++){
         let asciiValue=encodedFormula[i].charCodeAt(0);
@@ -119,7 +95,24 @@ function removeChildFromGraphComponent(formula,childAddress){
             let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
             // B1: A1 + 10
             // rid -> i, cid -> j
-            adj[prid][pcid].pop()
+            graphComponentMatrix[prid][pcid].push([crid,ccid])
+        }
+    }
+}
+
+function removeChildFromGraphComponent(formula,childAddress){
+    let[crid, ccid]=decodeRIDCIDfromAddress(childAddress);
+
+    // process to decode the formula eg C1= A1 + B1 ; C1 is the child of A1 and B1
+
+    let encodedFormula=formula.split(" ");
+    for(let i=0;i<encodedFormula.length;i++){
+        let asciiValue=encodedFormula[i].charCodeAt(0);
+        if(asciiValue>=65 && asciiValue<=90){
+            let [prid, pcid]= decodeRIDCIDfromAddress(encodedFormula[i]);
+            // B1: A1 + 10
+            // rid -> i, cid -> j
+            graphComponentMatrix[prid][pcid].pop()
         }
     }
 
@@ -160,6 +153,9 @@ function removeChild(formula){
 function updateChildrenCells(parentAddress){
     let [parentcell, parentcellProp]=getCell(parentAddress);
     let children=parentcellProp.children;
+    console.log("updating..")
+    
+
     // here the base case is the length itself
     for(let i=0;i<children.length; i++){
         let childAddress=children[i];
@@ -172,6 +168,7 @@ function updateChildrenCells(parentAddress){
 
     }
 }
+
 function evaluate(formula) {
     // Split the formula into an array of individual elements
     let encodedFormula = formula.split(" ");
@@ -194,7 +191,6 @@ function evaluate(formula) {
     return eval(decodedFormula);
   }
   
-
 
 function setCellUIandCellProp(evaluatedvalue, formula, address){
     let [cell,cellProp]=getCell(address);
