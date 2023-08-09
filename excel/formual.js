@@ -48,12 +48,12 @@ for (let i = 0; i < 100; i++) {
 }
    
 
-//accesing formula bar
+
 let formulaBar=document.querySelector(".formula-bar");
 // for formula evaluation
 // on enter event : --> normal expression, dependecy expression
 // normal expression: 10+20 =  ; DEPENDCY EXP+ A1+A2+10
-formulaBar.addEventListener("keydown",(e)=>{
+formulaBar.addEventListener("keydown",async (e)=>{
     //accessing the formula expression from the formula bar, evaluate new formula 
     let inputFormula=formulaBar.value;
 
@@ -67,12 +67,21 @@ formulaBar.addEventListener("keydown",(e)=>{
         addChildToGraphComponent(inputFormula, address);
         // check formula is cyclic or not then only evaluate
 
-        let iscyclic = isGraphCylic(graphComponentMatrix);
-        if(iscyclic){
-            alert(" Your formula is Cyclic");
+        let cycleResponse = isGraphCylic(graphComponentMatrix);
+        if(cycleResponse){
+            
+            let response=confirm("Your forumla is cycle. Do you wish to trace the path? ");
+            while(response==true){
+                // keep on tracking colour until user is satistified
+                await isGraphCylicTracePath(graphComponentMatrix, cycleResponse); // want to complete full iteration of colour tarcking, so attach wait here also.
+                response=confirm("Your forumla is cycle. Do you wish to trace the path? ");
+            }
+
             removeChildFromGraphComponent(inputFormula,address);
             return;
         }
+
+
         let evaluatedvalue = evaluate(inputFormula);
          // To update cell prop and ui
         setCellUIandCellProp(evaluatedvalue, inputFormula, address);
