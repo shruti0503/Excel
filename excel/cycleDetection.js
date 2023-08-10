@@ -2,14 +2,15 @@
 let collectedGraphComponent = [];
 let graphComponentMatrix = [];
 
-for (let i = 0; i < 100; i++) {
-    let row = [];
-    for (let j = 0; j < 26; j++) {
-        // Why array -> More than 1 child relation(dependency)
-        row.push([]);
-    }
-    graphComponentMatrix.push(row);
-}
+// Commented as we have implimented in 'sheetHandling' functionality
+// for (let i = 0; i < 100; i++) {
+//     let row = [];
+//     for (let j = 0; j < 26; j++) {
+//         // Why array -> More than 1 child relation(dependency)
+//         row.push([]);
+//     }
+//     graphComponentMatrix.push(row);
+// }
 
 // True -> cyclic, False -> Not cyclic
 function isGraphCylic(graphComponentMatrix) {

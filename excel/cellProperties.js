@@ -1,38 +1,43 @@
 // Declares an empty array sheetDB to store the data of the spreadsheet.
 let sheetDB=[];
+let collectedDB=[];
 
 // Each cell is represented by an object cellProp containing properties for styling and formatting.
-for(let i=0;i<100;i++){
-    let sheetRow=[];
-    for(let j=0;j<26;j++){
+// for(let i=0;i<100;i++){
+//     let sheetRow=[];
+//     for(let j=0;j<26;j++){
 
-        let cellProp={
-            //if i click on any cell 
-            //i need to 
-            // ui grid---> storage
-            //for cell and storage identification
-            //attribute of a cell -- rowId, colId
-            //mat[2][2]
+//         let cellProp={
+//             //if i click on any cell 
+//             //i need to 
+//             // ui grid---> storage
+//             //for cell and storage identification
+//             //attribute of a cell -- rowId, colId
+//             //mat[2][2]
 
-            bold: false,
-            italic: false,
-            underline: false,
-            alignment: "left",
-            fontFamily: "Arial",
-            fontSize: "14",
-            fontColor: "#000000",
-            BGcolor: "transparent", //just for indication purpose
-            value: "",
-            formula: "",
-            children: [] // for  children that are depended on cell cells 
+//             bold: false,
+//             italic: false,
+//             underline: false,
+//             alignment: "left",
+//             fontFamily: "Arial",
+//             fontSize: "14",
+//             fontColor: "#000000",
+//             BGcolor: "transparent", //just for indication purpose
+//             value: "",
+//             formula: "",
+//             children: [] // for  children that are depended on cell cells 
 
-        }
-        sheetRow.push(cellProp);
+//         }
+//         sheetRow.push(cellProp);
 
-    }
-    sheetDB.push(sheetRow)
+//     }
+//     sheetDB.push(sheetRow)
+// }
+{
+    let addSheetBtn= document.querySelector(".sheet-add-icon");
+    addSheetBtn.click();
+
 }
-
 // selectors for cell properties
 var bold = document.querySelector('.bold');
 let italic=document.querySelector(".italic")

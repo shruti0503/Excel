@@ -109,10 +109,12 @@ The > symbol in CSS is used to select immediate child elements. */
     height: 80%;
     width: 80%;
     display: flex;
-    width: calc(100vw - 2vw)
+    width: calc(100vw - 2vw);
+    overflow: auto;
 }
 .sheet-folder{
     font-weight: bold;
+    cursor: pointer;
     text-decoration: underline;
     text-decoration-thickness: 5px;
 }
@@ -189,5 +191,11 @@ The > symbol in CSS is used to select immediate child elements. */
     left: 0;
     height: 100%;
     width: 100%;
+}
+.sheets-folder-cont{
+    padding-top: 60px;
+}
+.sheet-add-icon{
+    cursor: pointer;
 }
 
